@@ -68,10 +68,42 @@ public class RubiksCube {
             edgeFrontOriginal[2][i] = edgeFrontCopy[2-i][2];
             edgeFrontOriginal[i][0] = edgeFrontCopy[2][i];
             // Меняем смежные грани
-            edgeUpOriginal[2][i] = edgeLeftCopy[2-i][2];
-            edgeRightOriginal[i][0] = edgeUpCopy[2][i];
-            edgeDownOriginal[0][i] = edgeRightCopy[2-i][0];
-            edgeLeftOriginal[i][2] = edgeDownCopy[0][i];
+            if (curr == 0) {
+                edgeUpOriginal[0][i] = edgeLeftCopy[0][i];
+                edgeRightOriginal[0][i] = edgeUpCopy[0][i];
+                edgeDownOriginal[0][i] = edgeRightCopy[0][i];
+                edgeLeftOriginal[0][i] = edgeDownCopy[0][i];
+            }
+            else if (curr == 1){
+                edgeUpOriginal[2][i] = edgeLeftCopy[2][i];
+                edgeRightOriginal[2][i] = edgeUpCopy[2][i];
+                edgeDownOriginal[2][i] = edgeRightCopy[2][i];
+                edgeLeftOriginal[2][i] = edgeDownCopy[2][i];
+            }
+            else if (curr == 2) {
+                edgeUpOriginal[i][0] = edgeLeftCopy[2 - i][2];
+                edgeRightOriginal[i][0] = edgeUpCopy[i][0];
+                edgeDownOriginal[i][0] = edgeRightCopy[i][0];
+                edgeLeftOriginal[i][2] = edgeDownCopy[2-i][0];
+            }
+            else if (curr == 3) {
+                edgeUpOriginal[i][2] = edgeLeftCopy[i][2];
+                edgeRightOriginal[i][0] = edgeUpCopy[2 - i][2];
+                edgeDownOriginal[i][2] = edgeRightCopy[2 - i][0];
+                edgeLeftOriginal[i][2] = edgeDownCopy[i][2];
+            }
+            else if (curr == 4) {
+                edgeUpOriginal[2][i] = edgeLeftCopy[2 - i][2];
+                edgeRightOriginal[i][0] = edgeUpCopy[2][i];
+                edgeDownOriginal[0][i] = edgeRightCopy[2 - i][0];
+                edgeLeftOriginal[i][2] = edgeDownCopy[0][i];
+            }
+            else if (curr == 5) {
+                edgeUpOriginal[0][i] = edgeLeftCopy[i][2];
+                edgeRightOriginal[i][0] = edgeUpCopy[0][2 - i];
+                edgeDownOriginal[2][i] = edgeRightCopy[i][0];
+                edgeLeftOriginal[i][2] = edgeDownCopy[2][2 - i];
+            }
         }
 
     }
