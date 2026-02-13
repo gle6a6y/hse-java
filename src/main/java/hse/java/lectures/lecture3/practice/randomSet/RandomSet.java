@@ -1,7 +1,6 @@
 package hse.java.lectures.lecture3.practice.randomSet;
 
 public class RandomSet<T extends Comparable<T>> {
-
     Node<T> root;
 
     RandomSet() {
