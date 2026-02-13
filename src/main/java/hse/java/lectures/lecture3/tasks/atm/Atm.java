@@ -16,15 +16,6 @@ public class Atm {
             this.value = value;
         }
 
-        static Denomination fromInt(int v) throws InvalidDepositException{
-            for (Denomination d : values()) {
-                if (d.value == v) {
-                    return d;
-                }
-            }
-            throw new InvalidDepositException("Invalid nominal value");
-        }
-
         int value() {
             return value;
         }
@@ -44,51 +35,51 @@ public class Atm {
         }
     }
 
-    public void deposit(Map<Integer, Integer> banknotes_) {
-        try {
-            if (banknotes_.isEmpty()) {
-                throw new InvalidDepositException("There is no money");
-            }
-            for (Map.Entry<Integer, Integer> entry : banknotes_.entrySet()) {
-                Denomination val = Denomination.fromInt(entry.getKey());
-                int oldValue = banknotes.get(val);
-                int amountOfNominal = entry.getValue();
-                if (amountOfNominal < 0) {
-                    throw new InvalidDepositException("Negative amount of " + entry.getKey().toString());
-                }
-                int newValue = oldValue + amountOfNominal;
-                banknotes.replace(val, oldValue, newValue);
-            }
+    public void deposit(Map<Denomination, Integer> banknotes_) {
+        if (banknotes_ == null) {
+            throw new InvalidDepositException("There is no money");
         }
-        catch (InvalidDepositException e) {
-            System.err.println(e.getMessage());
+        if (banknotes_.isEmpty()) {
+            throw new InvalidDepositException("There is no money");
+        }
+        for (Map.Entry<Denomination, Integer> entry : banknotes_.entrySet()) {
+            int oldValue = banknotes.getOrDefault(entry.getKey(), 0);
+            int amountOfNominal = entry.getValue();
+            if (amountOfNominal <= 0) {
+                throw new InvalidDepositException("Negative amount of " + entry.getKey().toString());
+            }
+            banknotes.put(entry.getKey(), oldValue + amountOfNominal);
         }
     }
 
     public Map<Denomination, Integer> withdraw(int amount) {
         Map<Denomination, Integer> mapka = new EnumMap<>(Denomination.class);
-        try {
-            if (amount <= 0) {
-                throw new InvalidAmountException("Amount is non positive");
+        if (amount <= 0) {
+            throw new InvalidAmountException("Amount is non positive");
+        }
+        if (amount > getBalance()) {
+            throw new InsufficientFundsException("Amount > atm balance");
+        }
+        for(int val : new int[]{5000, 1000, 500, 100, 50}) {
+            Denomination denom = Denomination.fromInt(val);
+            Integer count = banknotes.get(denom);
+            if (count == null || count == 0) {
+                continue;
             }
-            if (amount > getBalance()) {
-                throw new InsufficientFundsException("Amount > atm balance");
+
+            while (amount >= val && count > 0) {
+                int used = mapka.getOrDefault(denom, 0);
+                mapka.put(denom, used + 1);
+                amount -= val;
+                count--;
             }
-            for(int val : new int[]{5000, 1000, 500, 100, 50}) {
-                while (amount >= val) {
-                    int oldValue = mapka.get(Denomination.fromInt(val));
-                    mapka.replace(Denomination.fromInt(val), oldValue, oldValue + 1);
-                    amount -= val;
-                }
-            }
-            if (amount != 0) {
-                throw new CannotDispenseException("Can`t dicpense");
-            }
-            return mapka;
-        } catch (InvalidAmountException e) {
-            System.err.println(e.getMessage());
-        } catch (InsufficientFundsException e) {
-            System.err.println(e.getMessage());
+        }
+        if (amount > 0) {
+            throw new CannotDispenseException("Can`t dispense");
+        }
+        for(Map.Entry<Denomination, Integer> entry : mapka.entrySet()) {
+            int oldValue = banknotes.get(entry.getKey());
+            banknotes.put(entry.getKey(), oldValue - entry.getValue());
         }
         return mapka;
     }
